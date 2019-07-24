@@ -1,0 +1,138 @@
+#include <lua.hpp>
+#include "lua.pb.h"
+
+#ifdef WIN32
+#ifdef EXPORT
+#define LUAMOD_API __declspec(dllexport)
+#else
+#define LUAMOD_API __declspec(dllimport)
+#endif
+#else
+#define LUAMOD_API __attribute__ ((visibility("default")))
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+static
+int createProto(lua_State* L)
+{
+  printf("stack size: %d\n", lua_gettop(L));
+  size_t size = 0;
+  const char* buf = lua_tolstring(L, -1, &size);
+  proto_lua* pp = new proto_lua();
+  pp->ParseFromArray(buf, size);
+  lua_pushlightuserdata(L, pp);
+  luaL_getmetatable(L, "mt");
+  lua_setmetatable(L, -2);
+  return 1;
+}
+
+static 
+int getName(lua_State* L)
+{
+  proto_lua* pp = (proto_lua*)lua_touserdata(L, -1); 
+  if ( NULL == pp ){
+    return 0;
+  }
+  lua_pushstring(L, pp->name().c_str());
+  return 1;
+}
+
+static 
+int getSex(lua_State* L)
+{
+  proto_lua* pp = (proto_lua*)lua_touserdata(L, -1); 
+  if ( NULL == pp ){
+    return 0;
+  }
+  lua_pushstring(L, pp->sex().c_str());
+  return 1;
+}
+
+static 
+int getAge(lua_State* L)
+{
+  proto_lua* pp = (proto_lua*)lua_touserdata(L, -1); 
+  if ( NULL == pp ){
+    return 0;
+  }
+  lua_pushinteger(L, pp->age());
+  return 1;
+}
+
+static 
+int setName(lua_State* L)
+{
+  proto_lua* pp = (proto_lua*)lua_touserdata(L, 1); 
+  if ( NULL == pp ){
+    return 0;
+  }
+  size_t s;
+  const char* name = lua_tolstring(L, 2, &s);
+  printf("name: %s\n", name);
+  pp->set_name(name, s);
+  return 0;
+}
+
+static 
+int setSex(lua_State* L)
+{
+  proto_lua* pp = (proto_lua*)lua_touserdata(L, 1); 
+  if ( NULL == pp ){
+    return 0;
+  }
+  size_t s;
+  const char* sex = lua_tolstring(L, 2, &s);
+  printf("sex: %s\n", sex);
+  pp->set_sex(sex, s);
+  return 0;
+}
+
+static 
+int setAge(lua_State* L)
+{
+  proto_lua* pp = (proto_lua*)lua_touserdata(L, 1); 
+  if ( NULL == pp ){
+    return 0;
+  }
+  lua_Integer age = lua_tointeger(L, 2);
+  printf("age: %d\n", age);
+  pp->set_age(age);
+  return 0;
+}
+}
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+LUAMOD_API
+int luaopen_proto_lua(lua_State *L) {
+  luaL_Reg l[] = { 
+    { "get_name", getName },
+    { "get_sex", getSex },
+    { "get_age", getAge },
+    { "set_name", setName },
+    { "set_sex", setSex },
+    { "set_age", setAge },
+    { NULL, NULL },
+  };  
+  luaL_Reg l2[] = {
+    { "create", createProto },
+    { NULL, NULL },
+  };
+  luaL_newmetatable(L, "mt");
+  lua_newtable(L);
+  luaL_register(L, NULL, l);
+  lua_setfield(L, -2, "__index");
+  lua_pop(L, 1);
+
+  luaL_register(L, "protolua", l2);
+
+  //luaL_newlib(L,l);
+  return 1;
+}
+
+#ifdef __cplusplus
+}
+#endif
