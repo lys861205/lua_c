@@ -1,5 +1,5 @@
 CC :=g++
-CFLAGS  := -I. 
+CFLAGS  := -I. -g
 LDFLAGS := -llua -Bstatic -L/usr/local/lib/ -lprotobuf -lstdc++ -lpthread -Wl,-E
 SHARED  := -fPIC --shared
 

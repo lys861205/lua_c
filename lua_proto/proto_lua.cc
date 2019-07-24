@@ -14,13 +14,56 @@
 #ifdef __cplusplus
 extern "C" {
 static
-int createProto(lua_State* L)
+int createByBytes(lua_State* L)
 {
+  /*
   printf("stack size: %d\n", lua_gettop(L));
   size_t size = 0;
   const char* buf = lua_tolstring(L, -1, &size);
+  proto_lua* pp = (proto_lua*)lua_newuserdata(L, 100*sizeof(proto_lua));
+  if ( NULL == pp ){
+    return 0;
+  }
+  (*pp).ParseFromArray(buf, size);
+  // proto_lua* pp = new proto_lua();
+  // pp->ParseFromArray(buf, size);
+  // lua_pushlightuserdata(L, pp);
+  // 
+  luaL_getmetatable(L, "mt");
+  lua_setmetatable(L, -2);
+  */
+  size_t size = 0;
+  const char* buf = lua_tolstring(L, -1, &size);
   proto_lua* pp = new proto_lua();
+  if ( NULL == pp ){
+    return 0;
+  }
   pp->ParseFromArray(buf, size);
+  lua_pushlightuserdata(L, pp);
+  luaL_getmetatable(L, "mt");
+  lua_setmetatable(L, -2);
+  return 1;
+}
+static 
+int releaseBytes(lua_State* L)
+{
+  proto_lua* pp = (proto_lua*)lua_touserdata(L, -1);
+  if ( NULL == pp ){
+    return 0;
+  }
+  delete pp;
+  pp = NULL;
+  return 0;
+}
+
+static
+int createByObject(lua_State* L)
+{
+  printf("stack size: %d\n", lua_gettop(L));
+  proto_lua* pp = (proto_lua*)lua_touserdata(L, -1);
+  if ( NULL == pp ){
+    return 0;
+  }
   lua_pushlightuserdata(L, pp);
   luaL_getmetatable(L, "mt");
   lua_setmetatable(L, -2);
@@ -118,13 +161,15 @@ int luaopen_proto_lua(lua_State *L) {
     { NULL, NULL },
   };  
   luaL_Reg l2[] = {
-    { "create", createProto },
+    { "createFromBytes", createByBytes },
+    { "createFromObject", createByObject },
+    { "releaseBytes", releaseBytes },
     { NULL, NULL },
   };
-  luaL_newmetatable(L, "mt");
-  lua_newtable(L);
-  luaL_register(L, NULL, l);
-  lua_setfield(L, -2, "__index");
+  luaL_newmetatable(L, "mt");  //创建元表mt
+  lua_newtable(L); //创建表M
+  luaL_register(L, NULL, l); //为M表设置函数
+  lua_setfield(L, -2, "__index"); //设置元表mt的__index;  mt ={__index=M}
   lua_pop(L, 1);
 
   luaL_register(L, "protolua", l2);

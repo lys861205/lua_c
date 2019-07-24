@@ -45,6 +45,19 @@ int main(int argc ,char** argv)
         printf("call error: %s\n", lua_tostring(L, -1));
         return -1;
     }
+    /*
+    lua_getglobal(L,"ParseProtobuf");
+    proto_lua proto3;
+    proto3.set_name("xiao");
+    proto3.set_sex("nv");
+    proto3.set_age(10);
+    lua_pushlightuserdata(L, &proto3);
+    if (lua_pcall(L, 1, 0, 0))
+    {
+        printf("call error: %s\n", lua_tostring(L, -1));
+        return -1;
+    }
+    */
     lua_close(L);
   return 0;
 }
