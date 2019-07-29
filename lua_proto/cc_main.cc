@@ -2,11 +2,25 @@
 #include <string.h> 
 #include "lua.pb.h"
 
+static 
+int lua_call(lua_State* L)
+{
+  printf("call: %s\n", lua_tostring(L, -1));
+  lua_pushstring(L, "call return");
+  return 1;
+}
+
 int main(int argc ,char** argv)
 {
     lua_State *L = luaL_newstate();
 
     luaL_openlibs(L);
+
+    lua_pushcfunction(L, lua_call);
+    lua_pushstring(L, "hello lua_call");
+    lua_pcall(L, 1, 1, 0);
+    printf("#####%s\n", lua_tostring(L, -1));
+
 
     int ret = 0 ;
     //加载lua脚本文件
@@ -16,6 +30,12 @@ int main(int argc ,char** argv)
         return -1;
     }
     lua_resume( L, 0 );
+    lua_getglobal(L, "call_c_function");
+    lua_pushcfunction(L, lua_call);
+    lua_pcall(L, 1, 0, 0);
+
+
+
     lua_getglobal(L,"decodeObject");
     proto_lua proto;
     proto.set_name("liu");
@@ -45,6 +65,16 @@ int main(int argc ,char** argv)
         printf("call error: %s\n", lua_tostring(L, -1));
         return -1;
     }
+    printf("************* test coroutine *******************\n");
+    lua_State* L1 = lua_newthread(L);
+    printf("main stack size: %d\n", lua_gettop(L));
+    lua_getglobal(L1, "coroutine_test");
+    lua_pushthread(L1);
+
+    printf("L1 stack size: %d\n", lua_gettop(L1));
+    lua_resume(L1, 1);
+    //lua_resume(L1, 1);
+
     /*
     lua_getglobal(L,"ParseProtobuf");
     proto_lua proto3;

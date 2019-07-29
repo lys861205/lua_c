@@ -77,8 +77,10 @@ int getName(lua_State* L)
   if ( NULL == pp ){
     return 0;
   }
-  lua_pushstring(L, pp->name().c_str());
-  return 1;
+  //lua_pushstring(L, pp->name().c_str());
+  lua_pushliteral(L, "test is literal");
+  lua_error(L);
+  return -1;
 }
 
 static 
