@@ -24,24 +24,25 @@ function _M.test(self,a)
   print("function")
 end
 
+-- 这是只读表
 local ct = setmetatable({}, mt)
--- print(table.maxn(ct))
--- print(table.maxn(mt))
--- print(table.maxn(_M))
--- print(#ct)
--- print(#mt)
--- print(#_M)
--- for k, v in pairs(mt) do
---   print(type(k) .. " " .. type(v))
---   if type(v) == 'function' then
---     print(k)
---   else
---     print(k)
---   end
--- end
--- print(ct.k)
--- --ct:test("lua")
--- print(ct.key)
+print(table.maxn(ct))
+print(table.maxn(mt))
+print(table.maxn(_M))
+print(#ct)
+print(#mt)
+print(#_M)
+for k, v in pairs(mt) do
+  print(type(k) .. " " .. type(v))
+  if type(v) == 'function' then
+    print(k)
+  else
+    print(k)
+  end
+end
+print(ct.k)
+--ct:test("lua")
+print(ct.key)
 
 
 function call_c_function(f)
@@ -49,13 +50,13 @@ function call_c_function(f)
 end
 
 function decodeObject(data)
-  -- local user = pb.createFromObject(data)
-  -- print(user:get_name(data))
-  -- print(user:get_sex(data))
-  -- print(user:get_age(data))
-  -- user:set_name("xxxxx")
-  -- user:set_sex("renyao")
-  -- user:set_age(100)
+  local user = pb.createFromObject(data)
+  print(user:get_name(data))
+  print(user:get_sex(data))
+  print(user:get_age(data))
+  user:set_name("xxxxx")
+  user:set_sex("renyao")
+  user:set_age(100)
   return data
 end
 
