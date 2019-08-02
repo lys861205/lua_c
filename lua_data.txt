@@ -25,6 +25,7 @@ gradientangle=90
  CallInfo[label="<f0>CallInfo|<f1>func | <f2> top | <f3> previous | <f4> u | extra | nrersults | callstatus" shape="record" fillcolor = "red:green" ]
  l[label="<f0>base | <f1> savedpc" shape="record" fillcolor="green"]
  u[label="<f0>k | <f1> old_errfunc | <f2> ctx" shape="record" fillcolor="cyan" ]
+ Value:f1 -> GCObject:f0[label="*"]
  
  nk[label="<f0>Anonymous structure | <f1> TValuefields | <f2> next" shape="record" fillcolor="yellow:blue"]
  TKey[label="<f0>TKey(union) | <f1> nk | <f2> tvk" shape="record" fillcolor="green:red"]
