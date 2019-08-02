@@ -1,0 +1,108 @@
+digraph G {
+graph [
+rankdir = "LR"
+bgcolor = "white:lightblue"
+style="filled"
+gradientangle = 270];
+node [
+fontsize = "16"
+shape = "ellipse"
+style="filled"
+gradientangle=90
+];
+
+ 
+ L1[label="<f0>CommonHeader|<f1>nci|<f2>status|<f3>top|<f4>l_G|<f5>ci|<f6>oldpc|<f7>stack_last|<f8>stack|<f9>openupval|<f10>gclist|<f11>twups|<f12>errorJmp|<f13>base_ci|<f14>hook|<f15>errfunc|<f16>stacksize|<f17>basehookcount|<f18>hookcount|<f19>nny|<f20>nCcalls|<f21>hookmask|<f22>allowhook" shape="record" fillcolor = "magenta" ]
+ 
+ g_S[label="<f0>global_State|<f1>frealloc|<f2>ud|<f3>totalbytes|<f4>GCdebt|<f5>GCmemtrav|<f6>GCestimate|<f7>strt|<f8>l_registry|<f9>seed|<f10>currentwhite|<f11>gcstate|<f12>gckind|<f13>gcrunning|<f14>allgc|<f15>sweepgc|<f16>finobj|<f17>gray|<f18>grayagain|<f19>weak|<f20>ephemeron|<f21>allweak|<f22>tobefnz|<f23>fixedgc|<f24>twups|<f25>gcfinnum|<f26>gcpause|<f27>gcstepmul|<f28>panic|<f29>mainthread|<f30>version|<f31>memerrmsg|<f32>tmname|<f33>mt|<f34>strcache" shape="record" fillcolor="cyan:green"]
+ 
+  GCObject[label="<f0> GCObject | <f1> next | <f2> tt | <f3> marked" shape="record" fillcolor = "red" ]
+ GCObject:f1 -> GCObject:f0
+ 
+ //commhdr[label="<f3> CommonHeader | <f0> next |<f1> tt |<f2> marked" shape="record" fillcolor = "red" ]
+ TValuefields[label="<f0>TValue|<f1>value_|<f1>tt_" shape="record" fillcolor = "brown:yellow" gradientangle = 90]
+ Value[label="<f0>Value| <f1> gc | <f2> p | <f3> b | <f4> f| <f5> i | <f6> n" shape="record" fillcolor = "green" ]
+ CallInfo[label="<f0>CallInfo|<f1>func | <f2> top | <f3> previous | <f4> u | extra | nrersults | callstatus" shape="record" fillcolor = "red:green" ]
+ l[label="<f0>base | <f1> savedpc" shape="record" fillcolor="green"]
+ u[label="<f0>k | <f1> old_errfunc | <f2> ctx" shape="record" fillcolor="cyan" ]
+ 
+ nk[label="<f0>Anonymous structure | <f1> TValuefields | <f2> next" shape="record" fillcolor="yellow:blue"]
+ TKey[label="<f0>TKey(union) | <f1> nk | <f2> tvk" shape="record" fillcolor="green:red"]
+ TKey:f2 -> TValuefields:f0
+ TKey:f1 -> nk
+ nk:f1 -> TValuefields:f0
+ Nd[label="<f0>Node | <f1> i_val | <f2> i_key" shape="record" fillcolor="cyan:red"]
+ Nd:f1 -> TValuefields:f0
+ Nd:f2 -> TKey:f0
+ 
+ 
+ Table[label="<f0>Table|<f1>CommonHeader|<f2>flags|<f3>lsizenode|<f4>sizearray|<f5>array|<f6>node|<f7>lastfree|<f8>metatable|<f9>gclist" shape="record" fillcolor="red:yellow"]
+ Table:f1 -> GCObject:f0
+ Table:f5 -> TValuefields:f0
+ Table:f6 -> Nd:f0[lable="*"]
+ Table:f7 -> Nd:f0[label="*"]
+ Table:f8 -> Table:f0[label="*"]
+ Table:f9 -> GCObject:f0[label="*"]
+ 
+
+ UpVal[label="<f0>UpVal|<f1> v | refcount | <f2> u" shape="record" fillcolor="tomato:green"]
+ open[label="<f0> Anonymous structure | <f1> next | touched" shape="record" fillcolor="seagreen:red"]
+ u2[label="<f0> Anonymous structure | <f1> open | <f2> value" shape="record" fillcolor="purple:red"]
+ u2:f1 -> open:f0
+ u2:f2 -> TValuefields:f0
+ open:f1 -> UpVal:f0
+ 
+ lua_longjmp[label="<f0>lua_longjmp|<f1>previous|<f2>b|<f3>status" shape="record" fillcolor="yellow:red"]
+ lua_longjmp:f1 -> lua_longjmp:f0
+ 
+ stringtable[label="<f0>stringtable|<f1>hash | <f2> nuse | <f3> size" shape="record" fillcolor = "red:green"]
+ TString[label="<f0>TString | <f1>CommonHeader | <f2> extra | <f3> shrlen | <f4> hash | <f5> u" shape="record" fillcolor = "tomato:green"]
+ u3[label="<f0> union | <f1> lnglen | <f2> hnext" shape="record" fillcolor = "red:cyan"]
+ TString:f5 -> u3:f0
+ u3:f2 -> TString:f0
+ TString:f1 -> GCObject:f0
+ stringtable:f1 -> TString:f0[label="**"]
+ 
+ UpVal:f1 -> TValuefields:f0
+ UpVal:f2 -> union2
+ 
+ TValuefields:f1 -> Value:f0
+ CallInfo:f4 -> union1
+ union1 -> l:f0
+ union1 -> u:f0
+ union2 -> open:f0
+ union2 -> TValuefields:f0
+ l:f0 ->  TValuefields:f0
+ 
+ lua_State -> L1:f0
+ edge[color="seagreen"]
+ L1:f0 -> GCObject:f0
+ L1:f3 -> TValuefields:f0
+ L1:f5 -> CallInfo:f0[label="*"]
+ L1:f7 -> TValuefields:f0
+ L1:f8 -> TValuefields:f0
+ L1:f10 -> GCObject:f0
+ L1:f4 -> g_S:f0
+ L1:f11 -> L1:f0
+ L1:f12 -> lua_longjmp:f0
+ L1:f13 -> CallInfo:f0
+ 
+ edge[color="red"]
+ g_S:f7 -> stringtable:f0
+ g_S:f14 -> GCObject:f0[label="*"]
+ g_S:f15 -> GCObject:f0[label="**"]
+ g_S:f16 -> GCObject:f0[label="*"]
+ g_S:f17 -> GCObject:f0[label="*"]
+ g_S:f18 -> GCObject:f0[label="*"]
+ g_S:f19 -> GCObject:f0[label="*"]
+ g_S:f20 -> GCObject:f0[label="*"]
+ g_S:f21 -> GCObject:f0[label="*"]
+ g_S:f22 -> GCObject:f0[label="*"]
+ g_S:f23 -> GCObject:f0[label="*"]
+ g_S:f24 -> L1:f0[label="*"]
+ g_S:f29 -> L1:f0[label="*"]
+ g_S:f31 -> TString:f0[label="*"]
+ g_S:f32 -> TString:f0[label="*[]"]
+ g_S:f33 -> Table:f0[label="*[]"]
+ g_S:f34 -> TString:f0[label="*[]"]
+}
