@@ -10,6 +10,7 @@ end
 --   print(k)
 -- end
 --
+print('==================test const table==================')
 local newindex_func = function() error("this is const table, don`t insert element") end
 
 local _M = {k="hello"}
@@ -26,12 +27,12 @@ end
 
 -- 这是只读表
 local ct = setmetatable({}, mt)
-print(table.maxn(ct))
-print(table.maxn(mt))
-print(table.maxn(_M))
-print(#ct)
-print(#mt)
-print(#_M)
+-- print(table.maxn(ct))
+-- print(table.maxn(mt))
+-- print(table.maxn(_M))
+-- print(#ct)
+-- print(#mt)
+-- print(#_M)
 for k, v in pairs(mt) do
   print(type(k) .. " " .. type(v))
   if type(v) == 'function' then
@@ -43,6 +44,33 @@ end
 print(ct.k)
 --ct:test("lua")
 print(ct.key)
+
+print('==================test weak table==================')
+-- weak table: wt is weak table
+local wt = setmetatable({}, {__mode="v"})
+local obj1 = {id=1 , name="hero1"}
+local obj2 = {id=2 , name="hero2"}
+wt[obj1.id] = obj1
+wt[obj2.id] = obj2
+obj1 = nil
+obj2 = nil
+collectgarbage()
+for k, v in ipairs(wt) do
+  print(v)
+end
+
+local kwt = setmetatable({}, {__mode="k"})
+local v1 = {id=3 , name="hero3"}
+local v2 = {id=4 , name="hero4"}
+kwt[v1] = 3
+kwt[v2] = 4
+v1 = nil
+v2 = nil
+collectgarbage()
+for k, v in ipairs(kwt) do
+  print(v)
+end
+
 
 
 function call_c_function(f)
@@ -74,4 +102,40 @@ function coroutine_test(x)
   local a, b = coroutine.yield(10, x)
   print("co is runner")
 end
+
+
+print('==================== test escape function =================')
+
+function lua_escape(attr)
+  local escape_tb = {
+  ['&'] = '&amp;',
+  ['"'] = '&quot;',
+  ['<'] = '&lt;',
+  ['>'] = '&gt;',
+  }
+  attr = string.gsub(attr, '[&"<>]', escape_tb)
+  return attr
+end
+
+print(lua_escape([[<html>"hello"&"world"</html>]]))
+print(lua_escape('&'))
+print(lua_escape('"'))
+print(lua_escape('<'))
+print(lua_escape('>'))
+for k, v in pairs(arg) do
+  print("k " .. k .. " v " .. v)
+end
+
+
+t = {["day"]=02, ["year"]=2019, ["month"]=8, ["hour"]=15, ["min"]=7, ["sec"]=10}
+now = os.time(t)
+print(now)
+print(math.pi)
+
+
+
+
+
+
+
 

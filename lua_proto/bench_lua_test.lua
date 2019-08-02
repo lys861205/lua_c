@@ -1,5 +1,5 @@
 
-local start = os.clock()
+local start = os.time()
 
 for i=0, 1000000 do
   --print(i)
@@ -7,4 +7,4 @@ for i=0, 1000000 do
 end
 print()
 
-print("espace " .. os.clock()-start)
+print("espace " .. os.time()-start)
